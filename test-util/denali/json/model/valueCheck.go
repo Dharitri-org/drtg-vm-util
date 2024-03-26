@@ -3,6 +3,8 @@ package denalijsonmodel
 import (
 	"bytes"
 	"math/big"
+
+	oj "github.com/Dharitri-org/drtg-vm-util/test-util/orderedjson"
 )
 
 // JSONCheckBytes holds a byte slice condition.
@@ -11,7 +13,38 @@ import (
 type JSONCheckBytes struct {
 	Value    []byte
 	IsStar   bool
-	Original string
+	Original oj.OJsonObject
+}
+
+// JSONCheckBytesDefault yields JSONCheckBytes default "*" value.
+func JSONCheckBytesDefault() JSONCheckBytes {
+	return JSONCheckBytes{
+		Value:    []byte{},
+		IsStar:   true,
+		Original: &oj.OJsonString{Value: ""},
+	}
+}
+
+// JSONCheckBytesExplicitStar yields JSONCheckBytes explicit "*" value.
+func JSONCheckBytesExplicitStar() JSONCheckBytes {
+	return JSONCheckBytes{
+		Value:    []byte{},
+		IsStar:   true,
+		Original: &oj.OJsonString{Value: "*"},
+	}
+}
+
+// OriginalEmpty returns true if original = "".
+func (jcbytes JSONCheckBytes) OriginalEmpty() bool {
+	if str, isStr := jcbytes.Original.(*oj.OJsonString); isStr {
+		return len(str.Value) == 0
+	}
+	return false
+}
+
+// IsDefault yields true if the field was originally unspecified.
+func (jcbytes JSONCheckBytes) IsDefault() bool {
+	return jcbytes.IsStar && jcbytes.OriginalEmpty()
 }
 
 // Check returns true if condition expressed in object holds for another value.
@@ -32,6 +65,20 @@ type JSONCheckBigInt struct {
 	Original string
 }
 
+// JSONCheckBigIntDefault yields JSONCheckBigInt default "*" value.
+func JSONCheckBigIntDefault() JSONCheckBigInt {
+	return JSONCheckBigInt{
+		Value:    nil,
+		IsStar:   true,
+		Original: "",
+	}
+}
+
+// IsDefault yields true if the field was originally unspecified.
+func (jcbi JSONCheckBigInt) IsDefault() bool {
+	return jcbi.IsStar && len(jcbi.Original) == 0
+}
+
 // Check returns true if condition expressed in object holds for another value.
 // Explicit values are interpreted as equals assertion.
 func (jcbi JSONCheckBigInt) Check(other *big.Int) bool {
@@ -48,6 +95,20 @@ type JSONCheckUint64 struct {
 	Value    uint64
 	IsStar   bool
 	Original string
+}
+
+// JSONCheckUint64Default yields JSONCheckBigInt default "*" value.
+func JSONCheckUint64Default() JSONCheckUint64 {
+	return JSONCheckUint64{
+		Value:    0,
+		IsStar:   true,
+		Original: "",
+	}
+}
+
+// IsDefault yields true if the field was originally unspecified.
+func (jcu JSONCheckUint64) IsDefault() bool {
+	return jcu.IsStar && len(jcu.Original) == 0
 }
 
 // Check returns true if condition expressed in object holds for another value.

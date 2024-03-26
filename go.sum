@@ -1,7 +1,7 @@
-github.com/Dharitri-org/drtg-bigint v0.0.0 h1:EcrkQcYxLg+RCQre5ezwQu79ylS5HUFb7+WN4dDajBE=
-github.com/Dharitri-org/drtg-bigint v0.0.0/go.mod h1:ylHJu49RWsuap7jF/t+adMT7thADEIqoKa6wUaG+BWA=
-github.com/Dharitri-org/drtg-vm-common v0.0.3 h1:MGIJ2N4GbQrSBBskUQ8uBTpL9oGNhzZlyFbzfQ8Fmmc=
-github.com/Dharitri-org/drtg-vm-common v0.0.3/go.mod h1:tDiSMwcuHkyTfIk3w4rqi7NdB8PeuQrPknPd3fgdimg=
+github.com/Dharitri-org/drtg-bigint v0.0.1 h1:Saq5SxL4o1VzGib+YeI3AzxSdlGK71Qk79/W8i+kHvc=
+github.com/Dharitri-org/drtg-bigint v0.0.1/go.mod h1:ylHJu49RWsuap7jF/t+adMT7thADEIqoKa6wUaG+BWA=
+github.com/Dharitri-org/drtg-vm-common v0.0.4 h1:fgW9WmHVS+HeOPNqsd10zvJGs0IH1FGpoyHz3QayypA=
+github.com/Dharitri-org/drtg-vm-common v0.0.4/go.mod h1:tDiSMwcuHkyTfIk3w4rqi7NdB8PeuQrPknPd3fgdimg=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
