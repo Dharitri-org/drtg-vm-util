@@ -1,6 +1,7 @@
 package denalicontroller
 
 import (
+	fr "github.com/Dharitri-org/drtg-vm-util/test-util/denali/json/fileresolver"
 	mj "github.com/Dharitri-org/drtg-vm-util/test-util/denali/json/model"
 	mjparse "github.com/Dharitri-org/drtg-vm-util/test-util/denali/json/parse"
 )
@@ -18,11 +19,9 @@ type TestRunner struct {
 }
 
 // NewTestRunner creates new TestRunner instance.
-func NewTestRunner(executor TestExecutor, fileResolver mjparse.FileResolver) *TestRunner {
+func NewTestRunner(executor TestExecutor, fileResolver fr.FileResolver) *TestRunner {
 	return &TestRunner{
 		Executor: executor,
-		Parser: mjparse.Parser{
-			FileResolver: fileResolver,
-		},
+		Parser:   mjparse.NewParser(fileResolver),
 	}
 }

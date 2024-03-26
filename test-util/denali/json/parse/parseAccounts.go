@@ -8,15 +8,15 @@ import (
 	oj "github.com/Dharitri-org/drtg-vm-util/test-util/orderedjson"
 )
 
-func (p *Parser) parseAccountAddress(addrRaw string) (mj.JSONBytes, error) {
+func (p *Parser) parseAccountAddress(addrRaw string) (mj.JSONBytesFromString, error) {
 	if len(addrRaw) == 0 {
-		return mj.JSONBytes{}, errors.New("missing account address")
+		return mj.JSONBytesFromString{}, errors.New("missing account address")
 	}
-	addrBytes, err := p.parseAnyValueAsByteArray(addrRaw)
+	addrBytes, err := p.ValueInterpreter.InterpretString(addrRaw)
 	if err == nil && len(addrBytes) != 32 {
-		return mj.JSONBytes{}, errors.New("account addressis not 32 bytes in length")
+		return mj.JSONBytesFromString{}, errors.New("account addressis not 32 bytes in length")
 	}
-	return mj.JSONBytes{Value: addrBytes, Original: addrRaw}, err
+	return mj.NewJSONBytesFromString(addrBytes, addrRaw), err
 }
 
 func (p *Parser) processAccount(acctRaw oj.OJsonObject) (*mj.Account, error) {
@@ -51,22 +51,22 @@ func (p *Parser) processAccount(acctRaw oj.OJsonObject) (*mj.Account, error) {
 				return nil, errors.New("invalid account storage")
 			}
 			for _, storageKvp := range storageMap.OrderedKV {
-				byteKey, err := p.parseAnyValueAsByteArray(storageKvp.Key)
+				byteKey, err := p.ValueInterpreter.InterpretString(storageKvp.Key)
 				if err != nil {
 					return nil, fmt.Errorf("invalid account storage key: %w", err)
 				}
-				byteVal, err := p.processAnyValueAsByteArray(storageKvp.Value)
+				byteVal, err := p.processSubTreeAsByteArray(storageKvp.Value)
 				if err != nil {
 					return nil, fmt.Errorf("invalid account storage value: %w", err)
 				}
 				stElem := mj.StorageKeyValuePair{
-					Key:   mj.JSONBytes{Value: byteKey, Original: storageKvp.Key},
+					Key:   mj.NewJSONBytesFromString(byteKey, storageKvp.Key),
 					Value: byteVal,
 				}
 				acct.Storage = append(acct.Storage, &stElem)
 			}
 		case "code":
-			acct.Code, err = p.processAnyValueAsByteArray(kvp.Value)
+			acct.Code, err = p.processStringAsByteArray(kvp.Value)
 			if err != nil {
 				return nil, fmt.Errorf("invalid account code: %w", err)
 			}
@@ -112,7 +112,11 @@ func (p *Parser) processCheckAccount(acctRaw oj.OJsonObject) (*mj.CheckAccount, 
 	}
 
 	acct := mj.CheckAccount{
-		IgnoreStorage: false,
+		Nonce:         mj.JSONCheckUint64Default(),
+		Balance:       mj.JSONCheckBigIntDefault(),
+		IgnoreStorage: true,
+		Code:          mj.JSONCheckBytesDefault(),
+		AsyncCallData: mj.JSONCheckBytesDefault(),
 	}
 	var err error
 
@@ -134,25 +138,24 @@ func (p *Parser) processCheckAccount(acctRaw oj.OJsonObject) (*mj.CheckAccount, 
 				return nil, errors.New("invalid account balance")
 			}
 		case "storage":
-			if IsStar(kvp.Value) {
-				acct.IgnoreStorage = true
-			} else {
+			acct.IgnoreStorage = IsStar(kvp.Value)
+			if !acct.IgnoreStorage {
 				// TODO: convert to a more permissive format
 				storageMap, storageOk := kvp.Value.(*oj.OJsonMap)
 				if !storageOk {
 					return nil, errors.New("invalid account storage")
 				}
 				for _, storageKvp := range storageMap.OrderedKV {
-					byteKey, err := p.parseAnyValueAsByteArray(storageKvp.Key)
+					byteKey, err := p.ValueInterpreter.InterpretString(storageKvp.Key)
 					if err != nil {
 						return nil, fmt.Errorf("invalid account storage key: %w", err)
 					}
-					byteVal, err := p.processAnyValueAsByteArray(storageKvp.Value)
+					byteVal, err := p.processSubTreeAsByteArray(storageKvp.Value)
 					if err != nil {
 						return nil, fmt.Errorf("invalid account storage value: %w", err)
 					}
 					stElem := mj.StorageKeyValuePair{
-						Key:   mj.JSONBytes{Value: byteKey, Original: storageKvp.Key},
+						Key:   mj.NewJSONBytesFromString(byteKey, storageKvp.Key),
 						Value: byteVal,
 					}
 					acct.CheckStorage = append(acct.CheckStorage, &stElem)
@@ -164,10 +167,9 @@ func (p *Parser) processCheckAccount(acctRaw oj.OJsonObject) (*mj.CheckAccount, 
 				return nil, fmt.Errorf("invalid account code: %w", err)
 			}
 		case "asyncCallData":
-			// TODO: convert to JSONCheckString (when it exists)
-			acct.AsyncCallData, err = p.parseString(kvp.Value)
+			acct.AsyncCallData, err = p.parseCheckBytes(kvp.Value)
 			if err != nil {
-				return nil, fmt.Errorf("invalid asyncCallData string: %w", err)
+				return nil, fmt.Errorf("invalid asyncCallData: %w", err)
 			}
 		default:
 			return nil, fmt.Errorf("unknown account field: %s", kvp.Key)

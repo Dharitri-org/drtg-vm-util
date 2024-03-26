@@ -15,9 +15,9 @@ type Step interface {
 
 // NewAddressMock allows tests to specify what new addresses to generate
 type NewAddressMock struct {
-	CreatorAddress JSONBytes
+	CreatorAddress JSONBytesFromString
 	CreatorNonce   JSONUint64
-	NewAddress     JSONBytes
+	NewAddress     JSONBytesFromString
 }
 
 // BlockInfo contains data for the block info hooks
@@ -39,7 +39,7 @@ type SetStateStep struct {
 	Accounts          []*Account
 	PreviousBlockInfo *BlockInfo
 	CurrentBlockInfo  *BlockInfo
-	BlockHashes       []JSONBytes
+	BlockHashes       []JSONBytesFromString
 	NewAddressMocks   []*NewAddressMock
 }
 
@@ -47,6 +47,11 @@ type SetStateStep struct {
 type CheckStateStep struct {
 	Comment       string
 	CheckAccounts *CheckAccounts
+}
+
+// DumpStateStep is a step that simply prints the entire state to console. Useful for debugging.
+type DumpStateStep struct {
+	Comment string
 }
 
 // TxStep is a step where a transaction is executed.
@@ -60,6 +65,7 @@ type TxStep struct {
 var _ Step = (*ExternalStepsStep)(nil)
 var _ Step = (*SetStateStep)(nil)
 var _ Step = (*CheckStateStep)(nil)
+var _ Step = (*DumpStateStep)(nil)
 var _ Step = (*TxStep)(nil)
 
 // StepNameExternalSteps is a json step type name.
@@ -84,6 +90,14 @@ const StepNameCheckState = "checkState"
 // StepTypeName type as string
 func (*CheckStateStep) StepTypeName() string {
 	return StepNameCheckState
+}
+
+// StepNameDumpState is a json step type name.
+const StepNameDumpState = "dumpState"
+
+// StepTypeName type as string
+func (*DumpStateStep) StepTypeName() string {
+	return StepNameDumpState
 }
 
 // StepNameScCall is a json step type name.

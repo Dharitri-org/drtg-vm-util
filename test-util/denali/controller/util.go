@@ -1,10 +1,12 @@
 package denalicontroller
 
-import mjparse "github.com/Dharitri-org/drtg-vm-util/test-util/denali/json/parse"
+import (
+	fr "github.com/Dharitri-org/drtg-vm-util/test-util/denali/json/fileresolver"
+)
 
 // NewDefaultFileResolver yields a new DefaultFileResolver instance.
 // Reexported here to avoid having all external packages importing the parser.
 // DefaultFileResolver is in parse for local tests only.
-func NewDefaultFileResolver() *mjparse.DefaultFileResolver {
-	return mjparse.NewDefaultFileResolver()
+func NewDefaultFileResolver() *fr.DefaultFileResolver {
+	return fr.NewDefaultFileResolver()
 }
