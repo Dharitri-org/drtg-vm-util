@@ -10,7 +10,7 @@ const (
 	// ScCall describes a regular smart contract call
 	ScCall
 
-	// Transfer is an ERD transfer transaction without calling a smart contract
+	// Transfer is an MOA transfer transaction without calling a smart contract
 	Transfer
 
 	// ValidatorReward is when the protocol sends a validator reward to the target account.
