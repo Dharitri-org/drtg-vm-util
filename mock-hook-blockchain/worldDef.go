@@ -1,18 +1,36 @@
 package callbackblockchain
 
+// NewAddressMock allows tests to specify what new addresses to generate
+type NewAddressMock struct {
+	CreatorAddress []byte
+	CreatorNonce   uint64
+	NewAddress     []byte
+}
+
+// BlockInfo contains mock data about the corent block
+type BlockInfo struct {
+	BlockTimestamp uint64
+	BlockNonce     uint64
+	BlockRound     uint64
+	BlockEpoch     uint32
+}
+
 // BlockchainHookMock provides a mock representation of the blockchain to be used in VM tests.
 type BlockchainHookMock struct {
 	AcctMap                      AccountMap
-	CurrentTimestamp             uint64
+	PreviousBlockInfo            *BlockInfo
+	CurrentBlockInfo             *BlockInfo
 	Blockhashes                  [][]byte
 	mockAddressGenerationEnabled bool
+	NewAddressMocks              []*NewAddressMock
 }
 
 // NewMock creates a new mock instance
 func NewMock() *BlockchainHookMock {
 	return &BlockchainHookMock{
 		AcctMap:                      NewAccountMap(),
-		CurrentTimestamp:             0,
+		PreviousBlockInfo:            nil,
+		CurrentBlockInfo:             nil,
 		Blockhashes:                  nil,
 		mockAddressGenerationEnabled: false,
 	}
